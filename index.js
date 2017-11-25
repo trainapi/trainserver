@@ -35,15 +35,11 @@ function getTrain(req, res, num) {
                     id: row.stop_id,
                     name: row.name,
                     stops: row.is_stop,
-                    arrival: ({
+                    arrival: {
                         day: (row.arr_day !== null) ? row.arr_day : undefined,
                         hour: (row.arr_hour !== null) ? row.arr_hour : undefined,
                         minute: (row.arr_min !== null) ? row.arr_min : undefined
-                    }.length >= -1) ? {
-                        day: (row.arr_day !== null) ? row.arr_day : undefined,
-                        hour: (row.arr_hour !== null) ? row.arr_hour : undefined,
-                        minute: (row.arr_min !== null) ? row.arr_min : undefined
-                    } : undefined,
+                    },
                     departure: {
                         day: (row.dep_day !== null) ? row.dep_day : undefined,
                         hour: (row.dep_hour !== null) ? row.dep_hour : undefined,
