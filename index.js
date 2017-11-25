@@ -29,7 +29,7 @@ function getTrain(req, res, num) {
             type: row.code,
             route: []
         };
-        db.all(`SELECT routes.is_stop, routes.stop_id, routes.arr_day, routes.arr_hour, routes.arr_min, routes.dep_day, routes.dep_hour, routes.dep_min, stops.name FROM routes INNER JOIN stops ON routes.stop_id = stops.stop_id AND routes.country = stops.country WHERE routes.train_id = ?`, [num], (err, rows) => {
+        db.all(`SELECT routes.is_stop, routes.stop_id, routes.arr_day, routes.arr_hour, routes.arr_min, routes.dep_day, routes.dep_hour, routes.dep_min, stops.name, stops.lat, stops.lng FROM routes INNER JOIN stops ON routes.stop_id = stops.stop_id AND routes.country = stops.country WHERE routes.train_id = ?`, [num], (err, rows) => {
             rows.forEach((row) => {
                 train.route.push({
                     id: row.stop_id,
