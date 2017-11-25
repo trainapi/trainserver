@@ -196,7 +196,7 @@ function getStationSearch(req, res, name) {
 function getCountryInfo(req, res, country) {
     res.set('Content-Type', 'application/json');
 
-    db.get(`SELECT * FROM countries`, [], (err, row) => {
+    db.get(`SELECT * FROM countries WHERE id = ?`, [country], (err, row) => {
         if (err) {
             return console.error(err.message);
         }
@@ -206,6 +206,51 @@ function getCountryInfo(req, res, country) {
         };
 
         res.send(JSON.stringify(countryInfo));
+    });
+}
+
+function getCompanyList(req, res) {
+    res.set('Content-Type', 'application/json');
+
+    let companies = [];
+
+    db.all(`SELECT * FROM companies`, [], (err, rows) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        rows.forEach((row) => {
+            companies.push({
+                id: row.company_id,
+                name: row.name,
+                shortName: row.short_name,
+                number: row.number,
+                numberUIC: row.number4,
+                country: row.country
+            });
+        });
+
+        res.send(JSON.stringify(companies));
+    });
+}
+
+function getCompanyInfo(req, res, company) {
+    res.set('Content-Type', 'application/json');
+
+    db.get(`SELECT * FROM companies WHERE number = ?`, [company], (err, row) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        console.log(row);
+        let companyInfo = {
+            id: row.company_id,
+            name: row.name,
+            shortName: row.short_name,
+            number: row.number,
+            numberUIC: row.number4,
+            country: row.country
+        };
+
+        res.send(JSON.stringify(companyInfo));
     });
 }
 
@@ -239,6 +284,14 @@ app.get('/countryList', function (req, res) {
 
 app.get('/countryInfo/:countryId', function (req, res) {
     getCountryInfo(req, res, req.params.countryId);
+});
+
+app.get('/companyList', function (req, res) {
+    getCompanyList(req, res);
+});
+
+app.get('/companyInfo/:companyId', function (req, res) {
+    getCompanyInfo(req, res, req.params.companyId);
 });
 
 app.listen(4000, () => console.log('API running at localhost:4000'));
