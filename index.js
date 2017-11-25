@@ -166,6 +166,33 @@ function getCountryList(req, res) {
     });
 }
 
+function getStationSearch(req, res, name) {
+    res.set('Content-Type', 'application/json');
+
+    let sql = `SELECT * FROM stops WHERE name LIKE ?`;
+    let params = ['%' + name + '%'];
+    let stations = [];
+
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        rows.forEach((row) => {
+            stations.push({
+                id: row.stop_id,
+                country: row.country,
+                name: row.name,
+                coords: (row.lng !== null && row.lat !== null) ? {
+                    lat: row.lat,
+                    long: row.lng,
+                } : undefined,
+            });
+        });
+
+        res.send(JSON.stringify(stations));
+    });
+}
+
 function getCountryInfo(req, res, country) {
     res.set('Content-Type', 'application/json');
 
@@ -196,6 +223,10 @@ app.get('/stationInfoTrains/:stationId', function (req, res) {
 
 app.get('/stationList', function (req, res) {
     getStationList(req, res, null);
+});
+
+app.get('/stationSearch/:name', function (req, res) {
+    getStationSearch(req, res, req.params.name);
 });
 
 app.get('/stationList/:countryId', function (req, res) {
