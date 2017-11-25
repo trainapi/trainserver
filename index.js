@@ -13,11 +13,12 @@ let db = new sqlite.Database('./data.db', (err) => {
 function getTrain(req, res, num) {
     res.set('Content-Type', 'application/json');
 
-    db.get(`SELECT trains.name AS trainName, trains.company_id as trainCid, trains.code AS trainCode, companies.company_id AS compCid, companies.name AS compName, companies.short_name AS compShortName FROM trains INNER JOIN companies ON trains.company_id = companies.company_id WHERE trains.number = ?`, [num], (err, row) => {
+    db.get(`SELECT trains.code AS trainCode, trains.name AS trainName, trains.company_id as trainCid, trains.code AS trainCode, companies.company_id AS compCid, companies.name AS compName, companies.short_name AS compShortName FROM trains INNER JOIN companies ON trains.company_id = companies.company_id WHERE trains.number = ?`, [num], (err, row) => {
         if (err) {
             return console.error(err.message);
         }
         let train = {
+            code: row.trainCode,
             num: num,
             name: row.trainName,
             company: {
