@@ -48,7 +48,9 @@ function getTrain(req, res, num) {
                         day: (row.dep_day !== null) ? row.dep_day : undefined,
                         hour: (row.dep_hour !== null) ? row.dep_hour : undefined,
                         minute: (row.dep_min !== null) ? row.dep_min : undefined
-                    }
+                    },
+                    longitude: row.lng,
+                    latitude: row.lat
                 });
             });
 
