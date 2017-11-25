@@ -193,6 +193,43 @@ function getStationSearch(req, res, name) {
     });
 }
 
+function getConnectionList(req, res, from, to) {
+    res.set('Content-Type', 'application/json');
+
+    let sql = `SELECT t.code, t.number, t.name, r1.dep_hour, r1.dep_min, r2.arr_day - r1.dep_day AS arr_day, r2.arr_hour, r2.arr_min
+        FROM routes as r1
+        JOIN routes AS r2 ON r1.train_id = r2.train_id
+        JOIN trains AS t on t.number = r1.train_id
+        WHERE r1.stop_id = ? AND r2.stop_id = ? AND (r2.arr_day > r1.dep_day OR (r2.arr_day = r1.dep_day AND r2.arr_hour > r1.dep_hour OR (r2.arr_hour == r1.dep_hour AND r2.arr_min > r1.dep_min)))
+        ORDER BY r1.dep_hour, r1.dep_min`;
+    let params = [from, to];
+    let trains = [];
+
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        rows.forEach((row) => {
+            trains.push({
+                code: row.code,
+                number: row.number,
+                name: row.name,
+                departure: {
+                    hour: (row.dep_hour !== null) ? row.dep_hour : undefined,
+                    minute: (row.dep_min !== null) ? row.dep_min : undefined
+                },
+                arrival: {
+                    day: (row.arr_day !== null) ? row.arr_day : undefined,
+                    hour: (row.arr_hour !== null) ? row.arr_hour : undefined,
+                    minute: (row.arr_min !== null) ? row.arr_min : undefined
+                }
+            });
+        });
+
+        res.send(JSON.stringify(trains));
+    });
+}
+
 function getCountryInfo(req, res, country) {
     res.set('Content-Type', 'application/json');
 
@@ -276,6 +313,10 @@ app.get('/stationSearch/:name', function (req, res) {
 
 app.get('/stationList/:countryId', function (req, res) {
     getStationList(req, res, req.params.countryId);
+});
+
+app.get('/connectionList/:from/:to', function (req, res) {
+    getConnectionList(req, res, req.params.from, req.params.to);
 });
 
 app.get('/countryList', function (req, res) {
