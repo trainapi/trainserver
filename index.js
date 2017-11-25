@@ -29,7 +29,7 @@ function getTrain(req, res, num) {
             type: row.code,
             route: []
         };
-        db.all(`SELECT routes.is_stop, routes.stop_id, routes.arr_day, routes.arr_hour, routes.arr_min, routes.dep_day, routes.dep_hour, routes.dep_min, stops.name FROM routes INNER JOIN stops ON routes.stop_id = stops.stop_id AND routes.country = stops.country WHERE routes.train_id = ?`, [num], (err, rows) => {
+        db.all(`SELECT routes.is_stop, routes.stop_id, routes.arr_day, routes.arr_hour, routes.arr_min, routes.dep_day, routes.dep_hour, routes.dep_min, stops.name, stops.lat, stops.lng FROM routes INNER JOIN stops ON routes.stop_id = stops.stop_id AND routes.country = stops.country WHERE routes.train_id = ?`, [num], (err, rows) => {
             rows.forEach((row) => {
                 train.route.push({
                     id: row.stop_id,
@@ -44,7 +44,9 @@ function getTrain(req, res, num) {
                         day: (row.dep_day !== null) ? row.dep_day : undefined,
                         hour: (row.dep_hour !== null) ? row.dep_hour : undefined,
                         minute: (row.dep_min !== null) ? row.dep_min : undefined
-                    }
+                    },
+                    longitude: row.lng,
+                    latitude: row.lat
                 });
             });
 
@@ -198,7 +200,7 @@ function getConnectionList(req, res, from, to) {
         JOIN routes AS r2 ON r1.train_id = r2.train_id
         JOIN trains AS t on t.number = r1.train_id
         WHERE r1.stop_id = ? AND r2.stop_id = ? AND (r2.arr_day > r1.dep_day OR (r2.arr_day = r1.dep_day AND r2.arr_hour > r1.dep_hour OR (r2.arr_hour == r1.dep_hour AND r2.arr_min > r1.dep_min)))
-        ORDER BY r1.dep_hour, r1.dep_min`;
+        ORDER BY r1.dep_day, r1.dep_hour, r1.dep_min`;
     let params = [from, to];
     let trains = [];
 
