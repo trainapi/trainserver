@@ -82,14 +82,19 @@ function getStationInfoTrains(req, res, num) {
             id: num,
             name: row.name,
             country: row.country,
+            coords: {
+                lat: row.lat,
+                long: row.lng
+            },
             trains: []
         };
-        db.all(`SELECT routes.train_id, routes.arr_day, routes.arr_hour, routes.arr_min, routes.dep_day, routes.dep_hour, routes.dep_min, trains.name, trains.company_id AS trainCid FROM routes INNER JOIN trains ON trains.number = routes.train_id WHERE routes.is_stop = 1 AND routes.stop_id = ?`, [num], (err, rows) => {
+        db.all(`SELECT routes.train_id, routes.arr_day, routes.arr_hour, routes.arr_min, routes.dep_day, routes.dep_hour, routes.dep_min, trains.name, trains.company_id AS trainCid, trains.code FROM routes INNER JOIN trains ON trains.number = routes.train_id WHERE routes.is_stop = 1 AND routes.stop_id = ?`, [num], (err, rows) => {
             if (err) {
                 return console.error(err.message);
             }
             rows.forEach((row) => {
                 station.trains.push({
+                    code: row.code,
                     id: row.train_id,
                     name: row.name,
                     stops: row.is_stop,
