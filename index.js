@@ -201,7 +201,7 @@ function getConnectionList(req, res, from, to) {
         JOIN routes AS r2 ON r1.train_id = r2.train_id
         JOIN trains AS t on t.number = r1.train_id
         WHERE r1.stop_id = ? AND r2.stop_id = ? AND (r2.arr_day > r1.dep_day OR (r2.arr_day = r1.dep_day AND r2.arr_hour > r1.dep_hour OR (r2.arr_hour == r1.dep_hour AND r2.arr_min > r1.dep_min)))
-        ORDER BY r1.dep_hour, r1.dep_min`;
+        ORDER BY r1.dep_day, r1.dep_hour, r1.dep_min`;
     let params = [from, to];
     let trains = [];
 
