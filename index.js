@@ -146,6 +146,42 @@ function getStationList(req, res, country) {
     });
 }
 
+function getCountryList(req, res) {
+    res.set('Content-Type', 'application/json');
+
+    let countries = [];
+
+    db.all(`SELECT * FROM countries`, [], (err, rows) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        rows.forEach((row) => {
+            countries.push({
+                id: row.country,
+                name: row.country_name
+            });
+        });
+
+        res.send(JSON.stringify(countries));
+    });
+}
+
+function getCountryInfo(req, res, country) {
+    res.set('Content-Type', 'application/json');
+
+    db.get(`SELECT * FROM countries`, [], (err, row) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        let countryInfo = {
+            id: row.country,
+            name: row.country_name
+        };
+
+        res.send(JSON.stringify(countryInfo));
+    });
+}
+
 app.get('/train/:trainId', function (req, res) {
     getTrain(req, res, req.params.trainId);
 });
@@ -164,6 +200,14 @@ app.get('/stationList', function (req, res) {
 
 app.get('/stationList/:countryId', function (req, res) {
     getStationList(req, res, req.params.countryId);
+});
+
+app.get('/countryList', function (req, res) {
+    getCountryList(req, res);
+});
+
+app.get('/countryInfo/:countryId', function (req, res) {
+    getCountryInfo(req, res, req.params.countryId);
 });
 
 app.listen(4000, () => console.log('API running at localhost:4000'));
